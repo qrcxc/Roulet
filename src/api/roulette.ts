@@ -1,16 +1,102 @@
 import { MOCK_LIVE_BETS } from '../data/roulette'
 import type { LiveBet, LiveBetTab, RouletteBetRequestDto } from '../types'
-import { requestApi } from './client'
+import { ApiRequestError, apiSession, requestApi } from './client'
+
+const BET_API_TIMEOUT_MS = 1400
+
+interface LoginResponse {
+  token?: string
+  accessToken?: string
+  access_token?: string
+  user?: {
+    email?: string
+    username?: string
+    name?: string
+  }
+  email?: string
+  username?: string
+  name?: string
+}
+
+export interface LoginResult {
+  token: string
+  username: string
+  offline: boolean
+}
 
 export async function getRouletteConfig(): Promise<unknown> {
   return requestApi('/games/house/roulette/config')
 }
 
+export async function loginPlayer(identifier: string, password: string): Promise<LoginResult> {
+  const username = identifier.trim()
+
+  if (!username || !password.trim()) {
+    throw new Error('Enter login and password')
+  }
+
+  try {
+    const data = await requestApi<LoginResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        email: username,
+        username,
+        password,
+      }),
+    })
+
+    const token = data.token || data.accessToken || data.access_token
+    const displayName = data.user?.username || data.user?.email || data.user?.name || data.username || data.email || data.name || username
+
+    if (!token) {
+      throw new Error('Login response did not include an access token')
+    }
+
+    apiSession.setToken(token)
+    apiSession.setUserName(displayName)
+
+    return {
+      token,
+      username: displayName,
+      offline: false,
+    }
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status && error.status < 500 && error.status !== 404) {
+      throw error
+    }
+
+    const token = createLocalToken(username)
+    apiSession.setToken(token)
+    apiSession.setUserName(username)
+
+    return {
+      token,
+      username,
+      offline: true,
+    }
+  }
+}
+
 export async function placeRouletteBet(payload: RouletteBetRequestDto): Promise<unknown> {
-  return requestApi('/games/house/roulette/bet', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  })
+  const controller = new AbortController()
+  const timeoutId = window.setTimeout(() => controller.abort(), BET_API_TIMEOUT_MS)
+
+  try {
+    return await requestApi('/games/house/roulette/bet', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    })
+  } catch (error) {
+    return {
+      accepted: true,
+      offline: true,
+      payload,
+      reason: error instanceof Error ? error.message : 'API unavailable',
+    }
+  } finally {
+    window.clearTimeout(timeoutId)
+  }
 }
 
 export async function getLatestBets(tab: LiveBetTab): Promise<LiveBet[]> {
@@ -55,4 +141,9 @@ function normalizeLiveBet(data: unknown): LiveBet | null {
     multiplier,
     win,
   }
+}
+
+function createLocalToken(username: string): string {
+  const seed = `${username}:${Date.now()}:${Math.random().toString(36).slice(2)}`
+  return `local-${btoa(encodeURIComponent(seed)).replace(/=+$/g, '')}`
 }

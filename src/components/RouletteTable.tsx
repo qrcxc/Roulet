@@ -1,5 +1,6 @@
 import { COLUMN_TARGETS, OUTSIDE_TARGETS, TABLE_ROWS } from '../data/roulette'
 import type { BetTarget, PlacedBet } from '../types'
+import { getChipImage } from '../utils/chips'
 import { formatCoins, getNumberColor, getStraightTarget } from '../utils/roulette'
 
 interface RouletteTableProps {
@@ -87,5 +88,10 @@ function cellClass(number: number, winningNumber: number | null): string {
 function BetBadge({ bet }: { bet?: PlacedBet }) {
   if (!bet) return null
 
-  return <i className="bet-badge">{formatCoins(bet.amount)}</i>
+  return (
+    <i className="bet-badge" title={`${formatCoins(bet.amount)} COINS`}>
+      <img alt="" draggable="false" src={getChipImage(bet.amount)} />
+      <span>{formatCoins(bet.amount)}</span>
+    </i>
+  )
 }
