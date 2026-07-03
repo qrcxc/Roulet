@@ -34,12 +34,8 @@ export function AppShell({
   return (
     <div className="app-shell">
       <header className="topbar">
-        <button className="brand" onClick={() => onOpenPanel('home')} type="button" aria-label="Open The Doctor home">
-          <img className="brand-logo" src="/images/doctor-logo.png" alt="" />
-          <span>
-            <strong>THE DOCTOR</strong>
-            <small>Roulette</small>
-          </span>
+        <button className="brand" onClick={() => onOpenPanel('home')} type="button" aria-label="Open The Vitalik home">
+          <img className="brand-logo" src="/images/vitalik-logo.png" alt="The Vitalik" />
         </button>
         <div className="top-balance">
           <span>Balance</span>

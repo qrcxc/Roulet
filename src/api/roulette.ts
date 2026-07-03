@@ -24,6 +24,12 @@ export interface LoginResult {
   offline: boolean
 }
 
+export interface RouletteBetSubmission {
+  accepted: boolean
+  offline: boolean
+  reason?: string
+}
+
 export async function getRouletteConfig(): Promise<unknown> {
   return requestApi('/games/house/roulette/config')
 }
@@ -77,21 +83,25 @@ export async function loginPlayer(identifier: string, password: string): Promise
   }
 }
 
-export async function placeRouletteBet(payload: RouletteBetRequestDto): Promise<unknown> {
+export async function placeRouletteBet(payload: RouletteBetRequestDto): Promise<RouletteBetSubmission> {
   const controller = new AbortController()
   const timeoutId = window.setTimeout(() => controller.abort(), BET_API_TIMEOUT_MS)
 
   try {
-    return await requestApi('/games/house/roulette/bet', {
+    await requestApi('/games/house/roulette/bet', {
       method: 'POST',
       body: JSON.stringify(payload),
       signal: controller.signal,
     })
+
+    return {
+      accepted: true,
+      offline: false,
+    }
   } catch (error) {
     return {
       accepted: true,
       offline: true,
-      payload,
       reason: error instanceof Error ? error.message : 'API unavailable',
     }
   } finally {

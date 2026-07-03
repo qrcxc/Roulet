@@ -200,7 +200,14 @@ function App() {
     setNotice(null)
 
     try {
-      await placeRouletteBet(payload)
+      const submission = await placeRouletteBet(payload)
+
+      if (submission.offline) {
+        setNotice({
+          type: 'info',
+          message: 'API is unavailable, so this spin is running locally.',
+        })
+      }
     } catch (error) {
       if (continueAuto) stopAuto()
       setNotice({
