@@ -38,6 +38,7 @@ function App() {
   const [isAutoRunning, setIsAutoRunning] = useState(false)
   const [lastResult, setLastResult] = useState<SpinResult | null>(null)
   const [pendingResult, setPendingResult] = useState<SpinResult | null>(null)
+  const [spinHistory, setSpinHistory] = useState<SpinResult[]>([])
   const [spinIndex, setSpinIndex] = useState(0)
   const [liveBets, setLiveBets] = useState<LiveBet[]>([])
   const [liveTab, setLiveTab] = useState<LiveBetTab>('all')
@@ -228,6 +229,7 @@ function App() {
     window.setTimeout(() => {
       const nextBalance = balanceRef.current + result.payout
       setLastResult(result)
+      setSpinHistory((current) => [result, ...current].slice(0, 12))
       setPendingResult(null)
       setBalance((current) => {
         const updated = current + result.payout
@@ -335,6 +337,7 @@ function App() {
       ? `Win ${formatCoins(lastResult.payout)} COINS`
       : 'No win'
     : 'Place your chips'
+  const netResult = lastResult ? lastResult.payout - lastResult.totalBet : 0
 
   return (
     <>
@@ -382,9 +385,19 @@ function App() {
             </div>
 
             <div className="game-top">
-              <div className="result-strip">
+              <div className={lastResult ? `result-strip ${lastResult.payout > 0 ? 'win' : 'lose'}` : 'result-strip'}>
                 <span>{isSubmittingBet ? 'Checking API' : resultCopy}</span>
                 <strong>{lastResult ? lastResult.number : '-'}</strong>
+                {lastResult && (
+                  <div className="result-money">
+                    <small>{lastResult.payout > 0 ? 'Payout' : 'Payout'}</small>
+                    <b>{formatCoins(lastResult.payout)} COINS</b>
+                    <em className={netResult >= 0 ? 'positive' : 'danger'}>
+                      {netResult >= 0 ? '+' : ''}
+                      {formatCoins(netResult)} net
+                    </em>
+                  </div>
+                )}
               </div>
               <RouletteWheel
                 isSpinning={isSpinning}
@@ -393,6 +406,21 @@ function App() {
                 spinIndex={spinIndex}
               />
             </div>
+
+            <section className="spin-history" aria-label="Spin history">
+              <span>History</span>
+              <div>
+                {spinHistory.length ? (
+                  spinHistory.map((item) => (
+                    <i className={`history-number ${item.color} ${item.payout > 0 ? 'win' : ''}`} key={item.id}>
+                      {item.number}
+                    </i>
+                  ))
+                ) : (
+                  <small>No spins yet</small>
+                )}
+              </div>
+            </section>
 
             <RouletteTable betMap={betMap} disabled={isSubmittingBet || isSpinning} onTarget={addBet} winningNumber={lastResult?.number ?? null} />
 

@@ -6,7 +6,8 @@ import { playSound } from '../utils/sound'
 const BALL_START_ANGLE = -18
 const BALL_START_RADIUS = 134
 const BALL_TRACK_RADIUS = 126
-const BALL_POCKET_RADIUS = 118.5
+const BALL_POCKET_RADIUS = 93
+const BALL_POCKET_ANGLE_OFFSET = 0.5
 const SPIN_DURATION_MS = 6000
 
 interface RouletteWheelProps {
@@ -46,7 +47,7 @@ export function RouletteWheel({ isSpinning, result, soundOn, spinIndex }: Roulet
     const segment = 360 / EUROPEAN_WHEEL_ORDER.length
     const resultIndex = Math.max(0, EUROPEAN_WHEEL_ORDER.indexOf(result))
 
-    return resultIndex * segment + segment / 2
+    return resultIndex * segment + BALL_POCKET_ANGLE_OFFSET
   }, [result])
 
   useEffect(() => {
@@ -139,6 +140,12 @@ export function RouletteWheel({ isSpinning, result, soundOn, spinIndex }: Roulet
         <div className="wheel-track" />
         <img className="roulette-center-art" src="/images/roulette/center.svg" alt="" draggable="false" />
       </div>
+      {result !== null && !isSpinning && (
+        <div
+          className="landing-pocket-glow"
+          style={{ transform: `rotate(${targetAngle}deg) translateY(-${BALL_POCKET_RADIUS}px)` }}
+        />
+      )}
       <div className="roulette-ball-orbit" style={{ transform: `rotate(${ball.angle}deg) translateY(-${ball.radius}px)` }}>
         <span className={isSpinning ? 'roulette-ball is-spinning' : 'roulette-ball'} style={ballStyle}>
           <span className="roulette-ball-core">

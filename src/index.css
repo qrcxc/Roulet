@@ -536,9 +536,43 @@ a {
   text-align: center;
 }
 
+.result-strip.win {
+  border-color: rgba(245, 212, 122, 0.42);
+  box-shadow: 0 0 24px rgba(245, 212, 122, 0.14);
+}
+
+.result-strip.lose {
+  border-color: rgba(255, 141, 120, 0.24);
+}
+
 .result-strip strong {
   font-size: 46px;
   line-height: 1;
+}
+
+.result-money {
+  display: grid;
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.result-money small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.result-money b {
+  color: var(--gold);
+  font-size: 15px;
+}
+
+.result-money em {
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
 }
 
 .wheel-stage {
@@ -628,6 +662,24 @@ a {
   will-change: transform;
 }
 
+.landing-pocket-glow {
+  position: absolute;
+  z-index: 6;
+  top: 50%;
+  left: 50%;
+  width: 21px;
+  height: 21px;
+  margin: -10.5px 0 0 -10.5px;
+  border: 2px solid rgba(255, 245, 197, 0.9);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 245, 197, 0.26), rgba(245, 212, 122, 0.08) 52%, transparent 70%);
+  box-shadow:
+    0 0 0 4px rgba(245, 212, 122, 0.12),
+    0 0 18px rgba(245, 212, 122, 0.8);
+  pointer-events: none;
+  animation: pocketGlow 900ms ease-in-out infinite;
+}
+
 .roulette-ball {
   position: absolute;
   display: block;
@@ -708,6 +760,69 @@ a {
 
 .roulette-ball.is-spinning .roulette-ball-core {
   animation: ballLightPulse 420ms ease-in-out infinite;
+}
+
+.spin-history {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  margin: 2px 0 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.spin-history > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.spin-history div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.spin-history small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.history-number {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  color: white;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 900;
+  box-shadow: inset 0 -8px 16px rgba(0, 0, 0, 0.22);
+}
+
+.history-number.red {
+  background: linear-gradient(180deg, #ff735d, #c93627);
+}
+
+.history-number.black {
+  background: linear-gradient(180deg, #2c3442, #171e28);
+}
+
+.history-number.green {
+  background: linear-gradient(180deg, #9a955b, #5d6034);
+}
+
+.history-number.win {
+  border-color: rgba(245, 212, 122, 0.75);
+  box-shadow:
+    inset 0 -8px 16px rgba(0, 0, 0, 0.22),
+    0 0 12px rgba(245, 212, 122, 0.38);
 }
 
 .roulette-table {
@@ -1131,6 +1246,23 @@ td:first-child {
 
   50% {
     filter: brightness(1.08);
+  }
+}
+
+@keyframes pocketGlow {
+  0%,
+  100% {
+    opacity: 0.72;
+    box-shadow:
+      0 0 0 4px rgba(245, 212, 122, 0.11),
+      0 0 15px rgba(245, 212, 122, 0.64);
+  }
+
+  50% {
+    opacity: 1;
+    box-shadow:
+      0 0 0 6px rgba(245, 212, 122, 0.18),
+      0 0 24px rgba(245, 212, 122, 0.92);
   }
 }
 
