@@ -6,7 +6,7 @@ import { playSound } from '../utils/sound'
 const BALL_START_ANGLE = -18
 const BALL_START_RADIUS = 134
 const BALL_TRACK_RADIUS = 126
-const BALL_POCKET_RADIUS = 104
+const BALL_POCKET_RADIUS = 118.5
 const SPIN_DURATION_MS = 6000
 
 interface RouletteWheelProps {
@@ -89,7 +89,7 @@ export function RouletteWheel({ isSpinning, result, soundOn, spinIndex }: Roulet
         (BALL_TRACK_RADIUS - BALL_POCKET_RADIUS) * pocketDrop +
         deflectorHit * 3.7 +
         Math.abs(settleWobble) * 1.1
-      const scale = 1 - pocketDrop * 0.11 + deflectorHit * 0.052
+      const scale = 1 - pocketDrop * 0.16 + deflectorHit * 0.052
       const trail = clamp(0.08 + Math.pow(1 - progress, 0.7) * 0.48 - pocketProgress * 0.38, 0, 0.54)
       const pocket = getPocketIndex(angle)
       const minPocketSoundGap = 24 + progress * 48
@@ -112,7 +112,7 @@ export function RouletteWheel({ isSpinning, result, soundOn, spinIndex }: Roulet
       setBall({
         angle: targetAngle,
         radius: BALL_POCKET_RADIUS,
-        scale: 0.88,
+        scale: 0.84,
         trail: 0,
       })
     }
