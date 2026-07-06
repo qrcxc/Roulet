@@ -3,6 +3,7 @@ import type { LiveBet, LiveBetTab, RouletteBetRequestDto } from '../types'
 import { ApiRequestError, apiSession, requestApi } from './client'
 
 const BET_API_TIMEOUT_MS = 1400
+const ENABLE_API_BETS = import.meta.env.VITE_ENABLE_API_BETS === 'true'
 
 interface LoginResponse {
   token?: string
@@ -84,6 +85,14 @@ export async function loginPlayer(identifier: string, password: string): Promise
 }
 
 export async function placeRouletteBet(payload: RouletteBetRequestDto): Promise<RouletteBetSubmission> {
+  if (!ENABLE_API_BETS) {
+    return {
+      accepted: true,
+      offline: true,
+      reason: 'API bet submission is disabled',
+    }
+  }
+
   const controller = new AbortController()
   const timeoutId = window.setTimeout(() => controller.abort(), BET_API_TIMEOUT_MS)
 
